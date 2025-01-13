@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[240]:
+# In[1]:
 
 
 import tkinter as tk
@@ -3095,6 +3095,297 @@ treatment_label.grid(row=11, column=0, columnspan=2, pady=10)
 
 root.mainloop()
 
+
+
+# In[3]:
+
+
+import tkinter as tk
+import json
+import os
+from datetime import datetime
+import pyttsx3
+
+# Initialize speech engine
+engine = pyttsx3.init()
+
+# Function to speak the text
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Disease dictionary with treatment information
+disease_dict = {
+
+    "Acquired Immunodeficiency Syndrome (AIDS)": {
+        "description": (
+            "Acquired Immunodeficiency Syndrome (AIDS) is a disease caused by the Human Immunodeficiency Virus (HIV). "
+            "HIV attacks the body's immune system, weakening it over time. The virus primarily targets CD4 cells, which are crucial for immunity. "
+            "As HIV progresses, the body becomes more vulnerable to infections and certain cancers. "
+            "HIV is transmitted through blood, semen, vaginal fluids, and breast milk. "
+            "Without treatment, HIV can lead to AIDS, the final and most severe stage of HIV infection. "
+            "At this stage, the immune system is severely damaged, and the person is at high risk for opportunistic infections. "
+            "Common symptoms of AIDS include weight loss, chronic diarrhea, and fatigue. "
+            "While there is no cure for AIDS, antiretroviral therapy (ART) can slow the progression of the disease. "
+            "ART helps lower the amount of HIV in the blood, allowing people with HIV to live longer and healthier lives."
+        ),
+        "medicine": "Tenofovir",
+        "dose": "300 mg once a day",
+        "times_per_day": "Once a day",
+        "body_weight": "Dose based on individual case, usually not weight-based",
+        "lab_tests": [
+            "CD4 count", "HIV RNA test"
+        ],
+        "side_effects": [
+            "Nausea", "Headache", "Diarrhea", "Fatigue", "Liver damage"
+        ]
+    },
+
+    "Dementia": {
+        "description": "Dementia is a decline in cognitive function that affects memory, thinking, and daily functioning.",
+        "medicine": "Cholinesterase inhibitors (e.g., Donepezil), Memantine",
+        "dose": "Donepezil: 5-10 mg daily",
+        "times_per_day": "Once daily",
+        "side_effects": {
+            "Donepezil": ["Diarrhea", "Nausea", "Dizziness", "Insomnia"],
+            "Memantine": ["Dizziness", "Confusion", "Headache", "Constipation"]
+        },
+        "lab_tests": ["Mental status exam", "MRI of the brain"]
+    }
+    # Add more diseases here...
+}
+
+# File to store patient data
+patient_data_file = "patient_data.json"
+
+# Function to load patient data from a file
+def load_patient_data():
+    if os.path.exists(patient_data_file):
+        with open(patient_data_file, "r") as file:
+            return json.load(file)
+    return None
+
+# Function to save patient data to a file
+def save_patient_data(data):
+    with open(patient_data_file, "w") as file:
+        json.dump(data, file)
+
+# Function to simulate login process
+def on_login():
+    username = entry_username.get()
+    password = entry_password.get()
+    
+    stored_username = "Andromeda"  # Example username
+    stored_password = "Galaxy"  # Example password
+
+    if username == stored_username and password == stored_password:
+        speak("Welcome back, dear patient. It’s so good to have you here today. Your login was successful.")
+        speak("Ownership of data is completely yours. We respect your privacy")
+        speak("Before we move on, there is a small payment of $10 to be made via Google Pay to leena.nandi@gmail.com.")
+        speak("Once you’ve completed that, please let me know and we can continue with the next steps.")
+        payment_frame.pack(pady=20)
+        login_frame.pack_forget()
+    else:
+        speak("Oh no! It seems like the username or password you entered might be incorrect. Please take your time and double-check. I’m here to help you.")
+
+# Function to confirm payment
+def confirm_payment():
+    speak("Thank you for your payment. Let’s continue.")
+    payment_frame.pack_forget()
+    main_feed.pack(pady=20)
+    patient_data = load_patient_data()
+    if patient_data:
+        entry_patient_name.insert(0, patient_data["name"])
+        entry_patient_age.insert(0, patient_data["age"])
+        entry_patient_weight.insert(0, patient_data["weight"])
+        entry_patient_height.insert(0, patient_data["height"])
+        entry_patient_dob.insert(0, patient_data["dob"])
+        entry_patient_address.insert(0, patient_data["address"])
+        entry_patient_blood_group.insert(0, patient_data["blood_group"])
+        entry_patient_email.insert(0, patient_data["email"])
+
+# Function to submit patient data
+def submit_patient_data():
+    patient_data = {
+        "name": entry_patient_name.get(),
+        "age": entry_patient_age.get(),
+        "weight": entry_patient_weight.get(),
+        "height": entry_patient_height.get(),
+        "dob": entry_patient_dob.get(),
+        "address": entry_patient_address.get(),
+        "blood_group": entry_patient_blood_group.get(),
+        "email": entry_patient_email.get(),
+        "date_of_visit": datetime.today().strftime('%Y-%m-%d')
+    }
+    
+    save_patient_data(patient_data)
+    speak("Thank you so much for sharing your information. It’s been successfully saved. You’re doing wonderfully! Please take your time and relax while I prepare the next steps for you.")
+    speak("Now, if you’d like, I can provide you with detailed information about your treatment options and any medical advice you might need.")
+    
+    disease_input.pack(pady=10)
+    disease_info_button.pack(pady=10)
+
+# Function to show treatment information for the selected disease
+def show_treatment_info():
+    selected_disease = disease_var.get()
+    
+    if selected_disease in disease_dict:
+        disease_info = disease_dict[selected_disease]
+        
+        # Construct the treatment info text with labels
+        treatment_info_text = f"**Disease: {selected_disease}**\n\n"
+        treatment_info_text += f"**Description of Disease**: {disease_info['description']}\n\n"
+        
+        # Dose
+        treatment_info_text += f"**Dose**: {disease_info['dose']}\n"
+        
+        # Times per day
+        treatment_info_text += f"**Times per Day**: {disease_info['times_per_day']}\n"
+        
+        # Side effects
+        treatment_info_text += f"**Side Effects**: {', '.join(disease_info['side_effects'])}\n"
+        
+        # Lab tests
+        treatment_info_text += "**Recommended Lab Tests**:\n"
+        for test in disease_info['lab_tests']:
+            treatment_info_text += f"- {test}\n"
+        
+        # Display the treatment information in the label
+        treatment_label.config(text=treatment_info_text)
+        treatment_label.grid(row=11, column=0, columnspan=2, pady=10)
+
+        # Apply text wrapping and center alignment
+        treatment_label.config(
+            anchor="center",  # This centers the text within the label
+            justify="left",  # This justifies the text to the left (wrapping within the label)
+            wraplength=450,   # Wrap text after 450 pixels (~6 inches)
+            font=("Arial", 12)  # Set the font for better readability
+        )
+
+        # Speak the treatment information empathetically
+        speak(f"Now, let me explain the treatment information for {selected_disease}:")
+        speak(f"Here’s a brief overview: {disease_info['description']}")
+        speak(f"Your prescribed dose is {disease_info['dose']}. This will be taken {disease_info['times_per_day']} times a day.")
+        speak(f"Please follow the prescribed duration: {disease_info['duration']}.")
+        speak(f"Be aware that there could be some side effects like {', '.join(disease_info['side_effects'])}.")
+        speak("The recommended lab tests include:")
+        for test in disease_info['lab_tests']:
+            speak(f"- {test}")
+
+        speak("Would you be interested in sharing your experience with others on social media? It helps others who may be going through similar challenges. Of course, this is entirely up to you.")
+
+# Function to toggle full screen mode
+def toggle_fullscreen(event=None):
+    global is_fullscreen
+    is_fullscreen = not is_fullscreen
+    root.attributes('-fullscreen', is_fullscreen)
+
+# Initialize the Tkinter window
+root = tk.Tk()
+root.title("Health Assistant")
+
+# Set the window to full screen initially
+is_fullscreen = True
+root.attributes('-fullscreen', is_fullscreen)
+
+# Option to toggle full screen when pressing the Escape key
+root.bind("<Escape>", toggle_fullscreen)
+
+# Font settings for the UI components
+font_settings = ("Arial", 12)
+
+# Create login frame
+login_frame = tk.Frame(root)
+login_frame.pack(pady=20)
+
+# Username and password entry
+entry_username = tk.Entry(login_frame, font=font_settings)
+entry_username.pack(pady=5)
+
+entry_password = tk.Entry(login_frame, font=font_settings, show="*")
+entry_password.pack(pady=5)
+
+# Login button
+login_button = tk.Button(login_frame, text="Login", command=on_login, font=font_settings)
+login_button.pack(pady=5)
+
+# Payment frame
+payment_frame = tk.Frame(root)
+payment_label = tk.Label(payment_frame, text="Please make a $10 payment via Google Pay to leena.nandi@gmail.com", font=font_settings)
+payment_label.pack(pady=10)
+payment_confirm_button = tk.Button(payment_frame, text="Payment Confirmed", command=confirm_payment, font=font_settings)
+payment_confirm_button.pack(pady=10)
+
+# Main feed frame (hidden initially)
+main_feed = tk.Frame(root)
+
+# Patient information labels and entry fields
+label_patient_name = tk.Label(main_feed, text="Patient Name:", font=font_settings)
+label_patient_name.grid(row=0, column=0, pady=5, sticky="e")
+
+entry_patient_name = tk.Entry(main_feed, font=font_settings)
+entry_patient_name.grid(row=0, column=1, pady=5)
+
+label_patient_age = tk.Label(main_feed, text="Age:", font=font_settings)
+label_patient_age.grid(row=1, column=0, pady=5, sticky="e")
+
+entry_patient_age = tk.Entry(main_feed, font=font_settings)
+entry_patient_age.grid(row=1, column=1, pady=5)
+
+label_patient_weight = tk.Label(main_feed, text="Weight (kg):", font=font_settings)
+label_patient_weight.grid(row=2, column=0, pady=5, sticky="e")
+
+entry_patient_weight = tk.Entry(main_feed, font=font_settings)
+entry_patient_weight.grid(row=2, column=1, pady=5)
+
+label_patient_height = tk.Label(main_feed, text="Height (cm):", font=font_settings)
+label_patient_height.grid(row=3, column=0, pady=5, sticky="e")
+
+entry_patient_height = tk.Entry(main_feed, font=font_settings)
+entry_patient_height.grid(row=3, column=1, pady=5)
+
+label_patient_dob = tk.Label(main_feed, text="Date of Birth (YYYY-MM-DD):", font=font_settings)
+label_patient_dob.grid(row=4, column=0, pady=5, sticky="e")
+
+entry_patient_dob = tk.Entry(main_feed, font=font_settings)
+entry_patient_dob.grid(row=4, column=1, pady=5)
+
+label_patient_address = tk.Label(main_feed, text="Address:", font=font_settings)
+label_patient_address.grid(row=5, column=0, pady=5, sticky="e")
+
+entry_patient_address = tk.Entry(main_feed, font=font_settings)
+entry_patient_address.grid(row=5, column=1, pady=5)
+
+label_patient_blood_group = tk.Label(main_feed, text="Blood Group:", font=font_settings)
+label_patient_blood_group.grid(row=6, column=0, pady=5, sticky="e")
+
+entry_patient_blood_group = tk.Entry(main_feed, font=font_settings)
+entry_patient_blood_group.grid(row=6, column=1, pady=5)
+
+label_patient_email = tk.Label(main_feed, text="Email Address:", font=font_settings)
+label_patient_email.grid(row=7, column=0, pady=5, sticky="e")
+
+entry_patient_email = tk.Entry(main_feed, font=font_settings)
+entry_patient_email.grid(row=7, column=1, pady=5)
+
+# Submit patient data button
+submit_button = tk.Button(main_feed, text="Submit Data", command=submit_patient_data, font=font_settings)
+submit_button.grid(row=8, column=0, columnspan=2, pady=10)
+
+# Disease dropdown
+disease_var = tk.StringVar()
+disease_dropdown = tk.OptionMenu(main_feed, disease_var, *disease_dict.keys())
+disease_dropdown.grid(row=9, column=0, pady=10)
+
+# Button to show treatment information
+disease_info_button = tk.Button(main_feed, text="Show Treatment Information", command=show_treatment_info, font=font_settings)
+disease_info_button.grid(row=10, column=0, columnspan=2, pady=10)
+
+# Label for treatment info
+treatment_label = tk.Label(main_feed, text="", font=font_settings)
+treatment_label.grid(row=11, column=0, columnspan=2, pady=10)
+
+root.mainloop()
 
 
 # In[ ]:

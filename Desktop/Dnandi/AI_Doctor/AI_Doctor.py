@@ -1,22 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[26]:
 
 
 import tkinter as tk
-import json
-import os
-from datetime import datetime
+from tkinter import messagebox
 import pyttsx3
 
-# Initialize speech engine
+# Initialize the text-to-speech engine
 engine = pyttsx3.init()
-
-# Function to speak the text
-def speak(text):
-    engine.say(text)
-    engine.runAndWait()
+engine.setProperty('rate', 150)  # Speed of speech
+engine.setProperty('volume', 1)  # Volume level (0.0 to 1.0)
 
 # Disease dictionary with treatment information
 disease_dict = {
@@ -2888,259 +2883,73 @@ disease_dict = {
             "Memantine": ["Dizziness", "Confusion", "Headache", "Constipation"]
         },
         "lab_tests": ["Mental status exam", "MRI of the brain"]
-    }
-    # Add more diseases here...
-}
-
-# File to store patient data
-patient_data_file = "patient_data.json"
-
-# Function to load patient data from a file
-def load_patient_data():
-    if os.path.exists(patient_data_file):
-        with open(patient_data_file, "r") as file:
-            return json.load(file)
-    return None
-
-# Function to save patient data to a file
-def save_patient_data(data):
-    with open(patient_data_file, "w") as file:
-        json.dump(data, file)
-
-# Function to simulate login process
-def on_login():
-    username = entry_username.get()
-    password = entry_password.get()
-    
-    stored_username = "Andromeda"  # Example username
-    stored_password = "Galaxy"  # Example password
-
-    if username == stored_username and password == stored_password:
-        speak("Welcome back, dear patient. It’s so good to have you here today. Your login was successful.")
-        speak("Ownership of data is completely yours. We respect your privacy")
-        speak("Before we move on, there is a small payment of $10 to be made via Google Pay to leena.nandi@gmail.com.")
-        speak("Once you’ve completed tht, please let me know and we can continue with the next steps.")
-        payment_frame.pack(pady=20)
-        login_frame.pack_forget()
-    else:
-        speak("Oh no! It seems like the username or password you entered might be incorrect. Please take your time and double-check. I’m here to help you.")
-
-
-
-# Function to confirm payment
-def confirm_payment():
-    speak("Thank you for your payment. Let’s continue.")
-    payment_frame.pack_forget()
-    main_feed.pack(pady=20)
-    patient_data = load_patient_data()
-    if patient_data:
-        entry_patient_name.insert(0, patient_data["name"])
-        entry_patient_age.insert(0, patient_data["age"])
-        entry_patient_weight.insert(0, patient_data["weight"])
-        entry_patient_height.insert(0, patient_data["height"])
-        entry_patient_dob.insert(0, patient_data["dob"])
-        entry_patient_address.insert(0, patient_data["address"])
-        entry_patient_blood_group.insert(0, patient_data["blood_group"])
-        entry_patient_email.insert(0, patient_data["email"])
-
-# Function to submit patient data
-def submit_patient_data():
-    patient_data = {
-        "name": entry_patient_name.get(),
-        "age": entry_patient_age.get(),
-        "weight": entry_patient_weight.get(),
-        "height": entry_patient_height.get(),
-        "dob": entry_patient_dob.get(),
-        "address": entry_patient_address.get(),
-        "blood_group": entry_patient_blood_group.get(),
-        "email": entry_patient_email.get(),
-        "date_of_visit": datetime.today().strftime('%Y-%m-%d')
-    }
-    
-    save_patient_data(patient_data)
-    speak("Thank you so much for sharing your information. It’s been successfully saved. You’re doing wonderfully! Please take your time and relax while I prepare the next steps for you.")
-    speak("Now, if you’d like, I can provide you with detailed information about your treatment options and any medical advice you might need.")
-    
-    disease_input.pack(pady=10)
-    disease_info_button.pack(pady=10)
-
-# Function to show treatment information for the selected disease
-def show_treatment_info():
-    selected_disease = disease_var.get()
-    
-    if selected_disease in disease_dict:
-        disease_info = disease_dict[selected_disease]
-        
-        # Construct the treatment info text with labels
-        treatment_info_text = f"**Disease: {selected_disease}**\n\n"
-        treatment_info_text += f"**Description of Disease**: {disease_info['description']}\n\n"
-        
-        # Dose
-        treatment_info_text += f"**Dose**: {disease_info['dose']}\n"
-        
-        # Times per day
-        treatment_info_text += f"**Times per Day**: {disease_info['times_per_day']}\n"
-        
-        # Side effects
-        treatment_info_text += f"**Side Effects**: {disease_info['side_effects']}\n"
-        
-        # Lab tests
-        treatment_info_text += "**Recommended Lab Tests**:\n"
-        for test in disease_info['lab_tests']:
-            treatment_info_text += f"- {test}\n"
-        
-        # Display the treatment information in the label
-        treatment_label.config(text=treatment_info_text)
-        treatment_label.grid(row=11, column=0, columnspan=2, pady=10)
-
-        # Speak the treatment information empathetically
-        speak(f"Now, let me explain the treatment information for {selected_disease}:")
-        speak(f"Here’s a brief overview: {disease_info['description']}")
-        speak(f"Your prescribed dose is {disease_info['dose']}. This will be taken {disease_info['times_per_day']} times a day.")
-        speak(f"Please follow the prescribed duration: {disease_info['duration']}.")
-        speak(f"Be aware that there could be some side effects like {', '.join(disease_info['side_effects'])}.")
-        speak("The recommended lab tests include:")
-        for test in disease_info['lab_tests']:
-            speak(f"- {test}")
-
-        speak("Would you be interested in sharing your experience with others on social media? It helps others who may be going through similar challenges. Of course, this is entirely up to you.")
-
-
-# Function to toggle full screen mode
-def toggle_fullscreen(event=None):
-    global is_fullscreen
-    is_fullscreen = not is_fullscreen
-    root.attributes('-fullscreen', is_fullscreen)
-
-# Initialize the Tkinter window
-root = tk.Tk()
-root.title("Health Assistant")
-
-# Set the window to full screen initially
-is_fullscreen = True
-root.attributes('-fullscreen', is_fullscreen)
-
-# Option to toggle full screen when pressing the Escape key
-root.bind("<Escape>", toggle_fullscreen)
-
-# Font settings for the UI components
-font_settings = ("Arial", 12)
-
-# Create login frame
-login_frame = tk.Frame(root)
-login_frame.pack(pady=20)
-
-# Username and password entry
-entry_username = tk.Entry(login_frame, font=font_settings)
-entry_username.pack(pady=5)
-
-entry_password = tk.Entry(login_frame, font=font_settings, show="*")
-entry_password.pack(pady=5)
-
-# Login button
-login_button = tk.Button(login_frame, text="Login", command=on_login, font=font_settings)
-login_button.pack(pady=5)
-
-# Payment frame
-payment_frame = tk.Frame(root)
-payment_label = tk.Label(payment_frame, text="Please make a $10 payment via Google Pay to leena.nandi@gmail.com", font=font_settings)
-payment_label.pack(pady=10)
-payment_confirm_button = tk.Button(payment_frame, text="Payment Confirmed", command=confirm_payment, font=font_settings)
-payment_confirm_button.pack(pady=10)
-
-# Main feed frame (hidden initially)
-main_feed = tk.Frame(root)
-
-# Patient information labels and entry fields
-entry_patient_name = tk.Entry(main_feed, font=font_settings)
-entry_patient_name.grid(row=0, column=1, pady=5)
-
-entry_patient_age = tk.Entry(main_feed, font=font_settings)
-entry_patient_age.grid(row=1, column=1, pady=5)
-
-entry_patient_weight = tk.Entry(main_feed, font=font_settings)
-entry_patient_weight.grid(row=2, column=1, pady=5)
-
-entry_patient_height = tk.Entry(main_feed, font=font_settings)
-entry_patient_height.grid(row=3, column=1, pady=5)
-
-entry_patient_dob = tk.Entry(main_feed, font=font_settings)
-entry_patient_dob.grid(row=4, column=1, pady=5)
-
-entry_patient_address = tk.Entry(main_feed, font=font_settings)
-entry_patient_address.grid(row=5, column=1, pady=5)
-
-entry_patient_blood_group = tk.Entry(main_feed, font=font_settings)
-entry_patient_blood_group.grid(row=6, column=1, pady=5)
-
-entry_patient_email = tk.Entry(main_feed, font=font_settings)
-entry_patient_email.grid(row=7, column=1, pady=5)
-
-# Submit patient data button
-submit_button = tk.Button(main_feed, text="Submit Data", command=submit_patient_data, font=font_settings)
-submit_button.grid(row=8, column=0, columnspan=2, pady=10)
-
-# Disease dropdown
-disease_var = tk.StringVar()
-disease_dropdown = tk.OptionMenu(main_feed, disease_var, *disease_dict.keys())
-disease_dropdown.grid(row=9, column=0, pady=10)
-
-# Button to show treatment information
-disease_info_button = tk.Button(main_feed, text="Show Treatment Information", command=show_treatment_info, font=font_settings)
-disease_info_button.grid(row=10, column=0, columnspan=2, pady=10)
-
-# Label for treatment info
-treatment_label = tk.Label(main_feed, text="", font=font_settings)
-treatment_label.grid(row=11, column=0, columnspan=2, pady=10)
-
-root.mainloop()
-
-
-
-# In[3]:
-
-
-import tkinter as tk
-import json
-import os
-from datetime import datetime
-import pyttsx3
-
-# Initialize speech engine
-engine = pyttsx3.init()
-
-# Function to speak the text
-def speak(text):
-    engine.say(text)
-    engine.runAndWait()
-
-# Disease dictionary with treatment information
-disease_dict = {
-
-    "Acquired Immunodeficiency Syndrome (AIDS)": {
-        "description": (
-            "Acquired Immunodeficiency Syndrome (AIDS) is a disease caused by the Human Immunodeficiency Virus (HIV). "
-            "HIV attacks the body's immune system, weakening it over time. The virus primarily targets CD4 cells, which are crucial for immunity. "
-            "As HIV progresses, the body becomes more vulnerable to infections and certain cancers. "
-            "HIV is transmitted through blood, semen, vaginal fluids, and breast milk. "
-            "Without treatment, HIV can lead to AIDS, the final and most severe stage of HIV infection. "
-            "At this stage, the immune system is severely damaged, and the person is at high risk for opportunistic infections. "
-            "Common symptoms of AIDS include weight loss, chronic diarrhea, and fatigue. "
-            "While there is no cure for AIDS, antiretroviral therapy (ART) can slow the progression of the disease. "
-            "ART helps lower the amount of HIV in the blood, allowing people with HIV to live longer and healthier lives."
-        ),
-        "medicine": "Tenofovir",
-        "dose": "300 mg once a day",
-        "times_per_day": "Once a day",
-        "body_weight": "Dose based on individual case, usually not weight-based",
-        "lab_tests": [
-            "CD4 count", "HIV RNA test"
-        ],
-        "side_effects": [
-            "Nausea", "Headache", "Diarrhea", "Fatigue", "Liver damage"
-        ]
+    },
+   "Gestational Diabetes": {
+        "description": "Gestational diabetes is a type of diabetes that can develop during pregnancy. It typically goes away after childbirth, but increases the risk of type 2 diabetes later in life.",
+        "medicine": "Insulin, Metformin",
+        "dose": "As prescribed by doctor",
+        "times_per_day": "2-3 times daily",
+        "side_effects": {
+            "Insulin": ["Hypoglycemia", "Weight gain", "Injection site reactions"],
+            "Metformin": ["Nausea", "Diarrhea", "Stomach upset"]
+        },
+        "lab_tests": ["Blood sugar test", "Oral glucose tolerance test"]
+    },
+    "Preeclampsia": {
+        "description": "Preeclampsia is a pregnancy complication characterized by high blood pressure and signs of damage to other organs, often the kidneys or liver.",
+        "medicine": "Antihypertensives (e.g., Methyldopa, Labetalol), Magnesium sulfate (to prevent seizures)",
+        "dose": "Methyldopa: 250-500 mg twice daily",
+        "times_per_day": "Twice daily",
+        "side_effects": {
+            "Methyldopa": ["Drowsiness", "Dry mouth", "Fatigue"],
+            "Labetalol": ["Dizziness", "Low blood pressure", "Fatigue"],
+            "Magnesium sulfate": ["Flushing", "Shortness of breath", "Chest pain"]
+        },
+        "lab_tests": ["Blood pressure monitoring", "Urine tests", "Liver function tests"]
+    },
+    "Hyperemesis Gravidarum": {
+        "description": "Hyperemesis gravidarum is a severe form of nausea and vomiting during pregnancy that can lead to dehydration and weight loss.",
+        "medicine": "Antiemetic drugs (e.g., Ondansetron), Vitamin B6, Ginger supplements",
+        "dose": "Ondansetron: 4-8 mg as needed",
+        "times_per_day": "Up to 3 times daily",
+        "side_effects": {
+            "Ondansetron": ["Headache", "Dizziness", "Constipation"],
+            "Vitamin B6": ["Drowsiness", "Fatigue", "Irritability"]
+        },
+        "lab_tests": ["Blood test (to check electrolytes and hydration levels)", "Urine ketones test"]
+    },
+    "Ectopic Pregnancy": {
+        "description": "An ectopic pregnancy occurs when a fertilized egg implants outside the uterus, usually in the fallopian tubes, and cannot develop normally.",
+        "medicine": "Methotrexate (for non-surgical treatment), Surgery",
+        "dose": "Methotrexate: 50 mg/m² (single dose)",
+        "times_per_day": "One dose",
+        "side_effects": {
+            "Methotrexate": ["Nausea", "Fatigue", "Mouth sores"],
+            "Surgery": ["Pain", "Infection risk", "Heavy bleeding"]
+        },
+        "lab_tests": ["Ultrasound", "Blood tests (to check for hCG levels)"]
+    },
+    "Placenta Previa": {
+        "description": "Placenta previa occurs when the placenta is abnormally positioned in the uterus, covering or being near the cervix.",
+        "medicine": "Bed rest, C-section delivery (if necessary)",
+        "dose": "N/A",
+        "times_per_day": "N/A",
+        "side_effects": {
+            "Bed rest": ["Muscle weakness", "Blood clots"],
+            "C-section": ["Infection", "Bleeding", "Longer recovery time"]
+        },
+        "lab_tests": ["Ultrasound", "Pelvic exam (after 20 weeks if necessary)"]
     },
 
+    "Autism Spectrum Disorder": {
+        "description": "Autism spectrum disorder is a developmental disorder affecting communication, behavior, and social interaction.",
+        "medicine": "Therapies (ABA, Speech Therapy)",
+        "dose": "N/A",
+        "times_per_day": "N/A",
+        "body_weight": "Not applicable",
+        "lab_tests": ["Developmental screenings", "Genetic testing"],
+        "side_effects": {"Therapies": "No pharmaceutical side effects"}
+    },
     "Dementia": {
         "description": "Dementia is a decline in cognitive function that affects memory, thinking, and daily functioning.",
         "medicine": "Cholinesterase inhibitors (e.g., Donepezil), Memantine",
@@ -3151,240 +2960,365 @@ disease_dict = {
             "Memantine": ["Dizziness", "Confusion", "Headache", "Constipation"]
         },
         "lab_tests": ["Mental status exam", "MRI of the brain"]
+    },
+    "Diabetes": {
+        "description": "Diabetes is a group of diseases that result in high blood sugar (too much glucose in the blood).",
+        "medicine": "Insulin, Metformin, Glipizide",
+        "dose": "Insulin: As prescribed by doctor",
+        "times_per_day": "2-3 times daily",
+        "side_effects": {
+            "Insulin": ["Hypoglycemia", "Weight gain", "Injection site reactions"],
+            "Metformin": ["Nausea", "Diarrhea", "Stomach upset"]
+        },
+        "lab_tests": ["Blood sugar test", "Hemoglobin A1c test"]
+    },
+
+        "Gestational Diabetes": {
+        "description": "Gestational diabetes is a type of diabetes that can develop during pregnancy. It typically goes away after childbirth, but increases the risk of type 2 diabetes later in life.",
+        "medicine": "Insulin, Metformin",
+        "dose": "As prescribed by doctor",
+        "times_per_day": "2-3 times daily",
+        "side_effects": {
+            "Insulin": ["Hypoglycemia", "Weight gain", "Injection site reactions"],
+            "Metformin": ["Nausea", "Diarrhea", "Stomach upset"]
+        },
+        "lab_tests": ["Blood sugar test", "Oral glucose tolerance test"]
+    },
+    "Preeclampsia": {
+        "description": "Preeclampsia is a pregnancy complication characterized by high blood pressure and signs of damage to other organs, often the kidneys or liver.",
+        "medicine": "Antihypertensives (e.g., Methyldopa, Labetalol), Magnesium sulfate (to prevent seizures)",
+        "dose": "Methyldopa: 250-500 mg twice daily",
+        "times_per_day": "Twice daily",
+        "side_effects": {
+            "Methyldopa": ["Drowsiness", "Dry mouth", "Fatigue"],
+            "Labetalol": ["Dizziness", "Low blood pressure", "Fatigue"],
+            "Magnesium sulfate": ["Flushing", "Shortness of breath", "Chest pain"]
+        },
+        "lab_tests": ["Blood pressure monitoring", "Urine tests", "Liver function tests"]
+    },
+    "Hyperemesis Gravidarum": {
+        "description": "Hyperemesis gravidarum is a severe form of nausea and vomiting during pregnancy that can lead to dehydration and weight loss.",
+        "medicine": "Antiemetic drugs (e.g., Ondansetron), Vitamin B6, Ginger supplements",
+        "dose": "Ondansetron: 4-8 mg as needed",
+        "times_per_day": "Up to 3 times daily",
+        "side_effects": {
+            "Ondansetron": ["Headache", "Dizziness", "Constipation"],
+            "Vitamin B6": ["Drowsiness", "Fatigue", "Irritability"]
+        },
+        "lab_tests": ["Blood test (to check electrolytes and hydration levels)", "Urine ketones test"]
+    },
+    "Ectopic Pregnancy": {
+        "description": "An ectopic pregnancy occurs when a fertilized egg implants outside the uterus, usually in the fallopian tubes, and cannot develop normally.",
+        "medicine": "Methotrexate (for non-surgical treatment), Surgery",
+        "dose": "Methotrexate: 50 mg/m² (single dose)",
+        "times_per_day": "One dose",
+        "side_effects": {
+            "Methotrexate": ["Nausea", "Fatigue", "Mouth sores"],
+            "Surgery": ["Pain", "Infection risk", "Heavy bleeding"]
+        },
+        "lab_tests": ["Ultrasound", "Blood tests (to check for hCG levels)"]
+    },
+    "Placenta Previa": {
+        "description": "Placenta previa occurs when the placenta is abnormally positioned in the uterus, covering or being near the cervix.",
+        "medicine": "Bed rest, C-section delivery (if necessary)",
+        "dose": "N/A",
+        "times_per_day": "N/A",
+        "side_effects": {
+            "Bed rest": ["Muscle weakness", "Blood clots"],
+            "C-section": ["Infection", "Bleeding", "Longer recovery time"]
+        },
+        "lab_tests": ["Ultrasound", "Pelvic exam (after 20 weeks if necessary)"]
+    },
+
+    "Cataracts": {
+        "description": "Cataracts are a clouding of the lens in the eye that affects vision. It's a common condition, especially as people age.",
+        "medicine": "No medication for cataracts, surgery is typically needed.",
+        "dose": "N/A",
+        "times_per_day": "N/A",
+        "side_effects": {
+            "Surgery": ["Infection", "Bleeding", "Increased eye pressure", "Inflammation"]
+        },
+        "lab_tests": ["Eye examination", "Slit-lamp examination"]
+    },
+    "Glaucoma": {
+        "description": "Glaucoma is a group of eye diseases that damage the optic nerve, often due to high eye pressure, leading to vision loss.",
+        "medicine": "Prostaglandin analogs (e.g., Latanoprost), Beta-blockers (e.g., Timolol)",
+        "dose": "Latanoprost: 1 drop in the affected eye(s) once a day, Timolol: 1 drop in the affected eye(s) twice a day",
+        "times_per_day": "Once or twice daily depending on the medication",
+        "side_effects": {
+            "Latanoprost": ["Eye redness", "Iris darkening", "Blurred vision"],
+            "Timolol": ["Burning sensation in the eye", "Stinging", "Drowsiness"]
+        },
+        "lab_tests": ["Tonometry", "Visual field test", "Optic nerve imaging"]
+    },
+    "Macular Degeneration": {
+        "description": "Age-related macular degeneration (AMD) is a condition that affects the macula, the part of the eye responsible for clear central vision.",
+        "medicine": "Anti-VEGF injections (e.g., Ranibizumab), Photodynamic therapy",
+        "dose": "Ranibizumab: Intravitreal injection once a month or as directed by the doctor",
+        "times_per_day": "N/A (injection-based treatment)",
+        "side_effects": {
+            "Ranibizumab": ["Eye redness", "Increased intraocular pressure", "Eye pain"],
+            "Photodynamic therapy": ["Vision changes", "Eye discomfort", "Temporary vision impairment"]
+        },
+        "lab_tests": ["Amsler grid", "Fundus photography", "Fluorescein angiography"]
+    },
+    "Conjunctivitis (Pink Eye)": {
+        "description": "Conjunctivitis is inflammation or infection of the conjunctiva, the thin transparent layer covering the white part of the eye.",
+        "medicine": "Antibiotic eye drops (e.g., Erythromycin), Antihistamine eye drops (e.g., Olopatadine)",
+        "dose": "Erythromycin: Apply 1 cm of ointment into the lower eyelid 3-4 times daily",
+        "times_per_day": "3-4 times daily for bacterial infection, 1-2 times daily for allergic conjunctivitis",
+        "side_effects": {
+            "Erythromycin": ["Eye irritation", "Temporary blurred vision"],
+            "Olopatadine": ["Eye irritation", "Dry eyes", "Burning sensation"]
+        },
+        "lab_tests": ["Eye examination", "Conjunctival culture (if bacterial infection suspected)"]
+    },
+    "Diabetic Retinopathy": {
+        "description": "Diabetic retinopathy is a diabetes complication that affects the eyes and can lead to blindness if untreated.",
+        "medicine": "Anti-VEGF injections (e.g., Aflibercept), Laser surgery (focal laser therapy)",
+        "dose": "Aflibercept: Intravitreal injection every 4 weeks initially, then every 8 weeks",
+        "times_per_day": "N/A (injection-based treatment)",
+        "side_effects": {
+            "Aflibercept": ["Eye pain", "Increased intraocular pressure", "Eye redness"],
+            "Laser surgery": ["Temporary blurry vision", "Eye irritation", "Discomfort"]
+        },
+        "lab_tests": ["Dilated eye examination", "Fluorescein angiography", "Optical coherence tomography (OCT)"]
+    },
+    "Retinal Detachment": {
+        "description": "Retinal detachment is a serious condition where the retina peels away from its underlying tissue, which can lead to permanent vision loss.",
+        "medicine": "Surgical repair (e.g., laser surgery, pneumatic retinopexy)",
+        "dose": "N/A (surgical treatment)",
+        "times_per_day": "N/A",
+        "side_effects": {
+            "Surgery": ["Infection", "Increased intraocular pressure", "Vision changes"]
+        },
+        "lab_tests": ["Dilated eye examination", "Ultrasound of the eye", "OCT"]
+    },
+    "Astigmatism": {
+        "description": "Astigmatism is a refractive error caused by an irregular shape of the cornea or lens, leading to blurred vision.",
+        "medicine": "Glasses or contact lenses, Refractive surgery (e.g., LASIK)",
+        "dose": "N/A",
+        "times_per_day": "N/A",
+        "side_effects": {
+            "Glasses/Contact lenses": ["Eye discomfort", "Dry eyes"],
+            "LASIK": ["Dry eyes", "Glare", "Night vision issues"]
+        },
+        "lab_tests": ["Refraction test", "Keratometry"]
     }
     # Add more diseases here...
 }
 
-# File to store patient data
-patient_data_file = "patient_data.json"
+# Global variables for username and password
+username = 'user'
+password = 'password'
 
-# Function to load patient data from a file
-def load_patient_data():
-    if os.path.exists(patient_data_file):
-        with open(patient_data_file, "r") as file:
-            return json.load(file)
-    return None
+# Helper function for text-to-speech
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
 
-# Function to save patient data to a file
-def save_patient_data(data):
-    with open(patient_data_file, "w") as file:
-        json.dump(data, file)
+# Handle login
+def handle_login():
+    global username
+    global password
+    input_username = username_entry.get()
+    input_password = password_entry.get()
 
-# Function to simulate login process
-def on_login():
-    username = entry_username.get()
-    password = entry_password.get()
-    
-    stored_username = "Andromeda"  # Example username
-    stored_password = "Galaxy"  # Example password
-
-    if username == stored_username and password == stored_password:
-        speak("Welcome back, dear patient. It’s so good to have you here today. Your login was successful.")
-        speak("Ownership of data is completely yours. We respect your privacy")
-        speak("Before we move on, there is a small payment of $10 to be made via Google Pay to leena.nandi@gmail.com.")
-        speak("Once you’ve completed that, please let me know and we can continue with the next steps.")
-        payment_frame.pack(pady=20)
-        login_frame.pack_forget()
+    # Check login credentials
+    if input_username == username and input_password == password:
+        messagebox.showinfo("Login", "Login successful!")
+        open_patient_window()
     else:
-        speak("Oh no! It seems like the username or password you entered might be incorrect. Please take your time and double-check. I’m here to help you.")
+        messagebox.showerror("Login Error", "Invalid username or password!")
 
-# Function to confirm payment
-def confirm_payment():
-    speak("Thank you for your payment. Let’s continue.")
-    payment_frame.pack_forget()
-    main_feed.pack(pady=20)
-    patient_data = load_patient_data()
-    if patient_data:
-        entry_patient_name.insert(0, patient_data["name"])
-        entry_patient_age.insert(0, patient_data["age"])
-        entry_patient_weight.insert(0, patient_data["weight"])
-        entry_patient_height.insert(0, patient_data["height"])
-        entry_patient_dob.insert(0, patient_data["dob"])
-        entry_patient_address.insert(0, patient_data["address"])
-        entry_patient_blood_group.insert(0, patient_data["blood_group"])
-        entry_patient_email.insert(0, patient_data["email"])
+# Open patient data entry window
+def open_patient_window():
+    login_frame.pack_forget()  # Hide the login frame
+    patient_frame.pack(fill=tk.BOTH, expand=True)  # Show patient data entry window
+    speak("Please fill in the patient details.")
+    name_entry.focus()
 
-# Function to submit patient data
+# Handle reset password button
+def reset_username_password():
+    reset_frame.pack(fill=tk.BOTH, expand=True)  # Show reset window
+    speak("Please enter your new username and password.")
+
+# Save new username and password
+def save_new_username_password():
+    global username
+    global password
+    username = new_username_entry.get()
+    password = new_password_entry.get()
+    messagebox.showinfo("Username/Password Reset", "Your username and password have been updated.")
+    reset_frame.pack_forget()
+    login_frame.pack(fill=tk.BOTH, expand=True)
+
+# Submit patient data and show treatment information
 def submit_patient_data():
+    name = name_entry.get()
+    dob = dob_entry.get()
+    blood_group = blood_group_entry.get()
+    height = height_entry.get()
+    weight = weight_entry.get()
+
+    # Collect patient data (could be stored in a database)
     patient_data = {
-        "name": entry_patient_name.get(),
-        "age": entry_patient_age.get(),
-        "weight": entry_patient_weight.get(),
-        "height": entry_patient_height.get(),
-        "dob": entry_patient_dob.get(),
-        "address": entry_patient_address.get(),
-        "blood_group": entry_patient_blood_group.get(),
-        "email": entry_patient_email.get(),
-        "date_of_visit": datetime.today().strftime('%Y-%m-%d')
+        "Name": name,
+        "DOB": dob,
+        "Blood Group": blood_group,
+        "Height": height,
+        "Weight": weight
     }
-    
-    save_patient_data(patient_data)
-    speak("Thank you so much for sharing your information. It’s been successfully saved. You’re doing wonderfully! Please take your time and relax while I prepare the next steps for you.")
-    speak("Now, if you’d like, I can provide you with detailed information about your treatment options and any medical advice you might need.")
-    
-    disease_input.pack(pady=10)
-    disease_info_button.pack(pady=10)
 
-# Function to show treatment information for the selected disease
+    # Show disease selection
+    disease_label.pack()
+    disease_dropdown.pack()
+    disease_info_button.pack()
+
+# Show treatment information for the selected disease
 def show_treatment_info():
-    selected_disease = disease_var.get()
-    
-    if selected_disease in disease_dict:
-        disease_info = disease_dict[selected_disease]
+    disease = disease_var.get()
+    if disease in disease_dict:
+        treatment_info = disease_dict[disease]
+        description_textbox.delete(1.0, tk.END)
+        description_textbox.insert(tk.END, treatment_info['description'])
+        medicine_textbox.delete(1.0, tk.END)
+        medicine_textbox.insert(tk.END, treatment_info['medicine'])
+        dose_textbox.delete(1.0, tk.END)
+        dose_textbox.insert(tk.END, treatment_info['dose'])
+        times_per_day_textbox.delete(1.0, tk.END)
+        times_per_day_textbox.insert(tk.END, treatment_info['times_per_day'])
+        lab_tests_textbox.delete(1.0, tk.END)
+        lab_tests_textbox.insert(tk.END, ', '.join(treatment_info['lab_tests']))
         
-        # Construct the treatment info text with labels
-        treatment_info_text = f"**Disease: {selected_disease}**\n\n"
-        treatment_info_text += f"**Description of Disease**: {disease_info['description']}\n\n"
-        
-        # Dose
-        treatment_info_text += f"**Dose**: {disease_info['dose']}\n"
-        
-        # Times per day
-        treatment_info_text += f"**Times per Day**: {disease_info['times_per_day']}\n"
-        
-        # Side effects
-        treatment_info_text += f"**Side Effects**: {', '.join(disease_info['side_effects'])}\n"
-        
-        # Lab tests
-        treatment_info_text += "**Recommended Lab Tests**:\n"
-        for test in disease_info['lab_tests']:
-            treatment_info_text += f"- {test}\n"
-        
-        # Display the treatment information in the label
-        treatment_label.config(text=treatment_info_text)
-        treatment_label.grid(row=11, column=0, columnspan=2, pady=10)
+        # Speak all the information
+        speak("Here is the treatment information for the selected disease.")
+        speak(f"Description: {treatment_info['description']}")
+        speak(f"Medicine: {treatment_info['medicine']}")
+        speak(f"Dose: {treatment_info['dose']}")
+        speak(f"Times per day: {treatment_info['times_per_day']}")
+        speak(f"Lab Tests: {', '.join(treatment_info['lab_tests'])}")
 
-        # Apply text wrapping and center alignment
-        treatment_label.config(
-            anchor="center",  # This centers the text within the label
-            justify="left",  # This justifies the text to the left (wrapping within the label)
-            wraplength=450,   # Wrap text after 450 pixels (~6 inches)
-            font=("Arial", 12)  # Set the font for better readability
-        )
-
-        # Speak the treatment information empathetically
-        speak(f"Now, let me explain the treatment information for {selected_disease}:")
-        speak(f"Here’s a brief overview: {disease_info['description']}")
-        speak(f"Your prescribed dose is {disease_info['dose']}. This will be taken {disease_info['times_per_day']} times a day.")
-        speak(f"Please follow the prescribed duration: {disease_info['duration']}.")
-        speak(f"Be aware that there could be some side effects like {', '.join(disease_info['side_effects'])}.")
-        speak("The recommended lab tests include:")
-        for test in disease_info['lab_tests']:
-            speak(f"- {test}")
-
-        speak("Would you be interested in sharing your experience with others on social media? It helps others who may be going through similar challenges. Of course, this is entirely up to you.")
-
-# Function to toggle full screen mode
-def toggle_fullscreen(event=None):
-    global is_fullscreen
-    is_fullscreen = not is_fullscreen
-    root.attributes('-fullscreen', is_fullscreen)
-
-# Initialize the Tkinter window
+# Create main window
 root = tk.Tk()
-root.title("Health Assistant")
+root.title("Medical Application")
+root.geometry("1920x1080")  # Full screen size
 
-# Set the window to full screen initially
-is_fullscreen = True
-root.attributes('-fullscreen', is_fullscreen)
-
-# Option to toggle full screen when pressing the Escape key
-root.bind("<Escape>", toggle_fullscreen)
-
-# Font settings for the UI components
-font_settings = ("Arial", 12)
-
-# Create login frame
+# Create frames
 login_frame = tk.Frame(root)
-login_frame.pack(pady=20)
+patient_frame = tk.Frame(root)
+reset_frame = tk.Frame(root)
 
-# Username and password entry
-entry_username = tk.Entry(login_frame, font=font_settings)
-entry_username.pack(pady=5)
+# LOGIN FRAME
+username_label = tk.Label(login_frame, text="Username:")
+username_label.pack(pady=5)
+username_entry = tk.Entry(login_frame, font=("Arial", 10))
+username_entry.pack(pady=5)
 
-entry_password = tk.Entry(login_frame, font=font_settings, show="*")
-entry_password.pack(pady=5)
+password_label = tk.Label(login_frame, text="Password:")
+password_label.pack(pady=5)
+password_entry = tk.Entry(login_frame, show="*", font=("Arial", 10))
+password_entry.pack(pady=5)
 
-# Login button
-login_button = tk.Button(login_frame, text="Login", command=on_login, font=font_settings)
-login_button.pack(pady=5)
+login_button = tk.Button(login_frame, text="Login", command=handle_login, font=("Arial", 12))
+login_button.pack(pady=10)
 
-# Payment frame
-payment_frame = tk.Frame(root)
-payment_label = tk.Label(payment_frame, text="Please make a $10 payment via Google Pay to leena.nandi@gmail.com", font=font_settings)
-payment_label.pack(pady=10)
-payment_confirm_button = tk.Button(payment_frame, text="Payment Confirmed", command=confirm_payment, font=font_settings)
-payment_confirm_button.pack(pady=10)
+reset_button = tk.Button(login_frame, text="Reset Username/Password", command=reset_username_password, font=("Arial", 12))
+reset_button.pack(pady=10)
 
-# Main feed frame (hidden initially)
-main_feed = tk.Frame(root)
+login_frame.pack(fill=tk.BOTH, expand=True)  # Show login screen initially
 
-# Patient information labels and entry fields
-label_patient_name = tk.Label(main_feed, text="Patient Name:", font=font_settings)
-label_patient_name.grid(row=0, column=0, pady=5, sticky="e")
+# PATIENT FRAME
+name_label = tk.Label(patient_frame, text="Patient Name:")
+name_label.pack(pady=5)
+name_entry = tk.Entry(patient_frame, font=("Arial", 10))
+name_entry.pack(pady=5)
 
-entry_patient_name = tk.Entry(main_feed, font=font_settings)
-entry_patient_name.grid(row=0, column=1, pady=5)
+dob_label = tk.Label(patient_frame, text="Date of Birth (DD/MM/YYYY):")
+dob_label.pack(pady=5)
+dob_entry = tk.Entry(patient_frame, font=("Arial", 10))
+dob_entry.pack(pady=5)
 
-label_patient_age = tk.Label(main_feed, text="Age:", font=font_settings)
-label_patient_age.grid(row=1, column=0, pady=5, sticky="e")
+blood_group_label = tk.Label(patient_frame, text="Blood Group:")
+blood_group_label.pack(pady=5)
+blood_group_entry = tk.Entry(patient_frame, font=("Arial", 10))
+blood_group_entry.pack(pady=5)
 
-entry_patient_age = tk.Entry(main_feed, font=font_settings)
-entry_patient_age.grid(row=1, column=1, pady=5)
+height_label = tk.Label(patient_frame, text="Height (cm):")
+height_label.pack(pady=5)
+height_entry = tk.Entry(patient_frame, font=("Arial", 10))
+height_entry.pack(pady=5)
 
-label_patient_weight = tk.Label(main_feed, text="Weight (kg):", font=font_settings)
-label_patient_weight.grid(row=2, column=0, pady=5, sticky="e")
+weight_label = tk.Label(patient_frame, text="Weight (kg):")
+weight_label.pack(pady=5)
+weight_entry = tk.Entry(patient_frame, font=("Arial", 10))
+weight_entry.pack(pady=5)
 
-entry_patient_weight = tk.Entry(main_feed, font=font_settings)
-entry_patient_weight.grid(row=2, column=1, pady=5)
+submit_button = tk.Button(patient_frame, text="Submit Patient Data", command=submit_patient_data, font=("Arial", 12))
+submit_button.pack(pady=10)
 
-label_patient_height = tk.Label(main_feed, text="Height (cm):", font=font_settings)
-label_patient_height.grid(row=3, column=0, pady=5, sticky="e")
+# Reset Username/Password FRAME
+new_username_label = tk.Label(reset_frame, text="New Username:")
+new_username_label.pack(pady=5)
+new_username_entry = tk.Entry(reset_frame, font=("Arial", 10))
+new_username_entry.pack(pady=5)
 
-entry_patient_height = tk.Entry(main_feed, font=font_settings)
-entry_patient_height.grid(row=3, column=1, pady=5)
+new_password_label = tk.Label(reset_frame, text="New Password:")
+new_password_label.pack(pady=5)
+new_password_entry = tk.Entry(reset_frame, show="*", font=("Arial", 10))
+new_password_entry.pack(pady=5)
 
-label_patient_dob = tk.Label(main_feed, text="Date of Birth (YYYY-MM-DD):", font=font_settings)
-label_patient_dob.grid(row=4, column=0, pady=5, sticky="e")
+save_button = tk.Button(reset_frame, text="Save", command=save_new_username_password, font=("Arial", 12))
+save_button.pack(pady=10)
 
-entry_patient_dob = tk.Entry(main_feed, font=font_settings)
-entry_patient_dob.grid(row=4, column=1, pady=5)
+# Disease selection and treatment info display
+disease_label = tk.Label(patient_frame, text="Select Disease:")
+disease_label.pack(pady=5)
 
-label_patient_address = tk.Label(main_feed, text="Address:", font=font_settings)
-label_patient_address.grid(row=5, column=0, pady=5, sticky="e")
-
-entry_patient_address = tk.Entry(main_feed, font=font_settings)
-entry_patient_address.grid(row=5, column=1, pady=5)
-
-label_patient_blood_group = tk.Label(main_feed, text="Blood Group:", font=font_settings)
-label_patient_blood_group.grid(row=6, column=0, pady=5, sticky="e")
-
-entry_patient_blood_group = tk.Entry(main_feed, font=font_settings)
-entry_patient_blood_group.grid(row=6, column=1, pady=5)
-
-label_patient_email = tk.Label(main_feed, text="Email Address:", font=font_settings)
-label_patient_email.grid(row=7, column=0, pady=5, sticky="e")
-
-entry_patient_email = tk.Entry(main_feed, font=font_settings)
-entry_patient_email.grid(row=7, column=1, pady=5)
-
-# Submit patient data button
-submit_button = tk.Button(main_feed, text="Submit Data", command=submit_patient_data, font=font_settings)
-submit_button.grid(row=8, column=0, columnspan=2, pady=10)
-
-# Disease dropdown
 disease_var = tk.StringVar()
-disease_dropdown = tk.OptionMenu(main_feed, disease_var, *disease_dict.keys())
-disease_dropdown.grid(row=9, column=0, pady=10)
+disease_dropdown = tk.OptionMenu(patient_frame, disease_var, *disease_dict.keys())
+disease_dropdown.pack(pady=10)
 
-# Button to show treatment information
-disease_info_button = tk.Button(main_feed, text="Show Treatment Information", command=show_treatment_info, font=font_settings)
-disease_info_button.grid(row=10, column=0, columnspan=2, pady=10)
+disease_info_button = tk.Button(patient_frame, text="Show Treatment Information", command=show_treatment_info, font=("Arial", 12))
+disease_info_button.pack(pady=10)
 
-# Label for treatment info
-treatment_label = tk.Label(main_feed, text="", font=font_settings)
-treatment_label.grid(row=11, column=0, columnspan=2, pady=10)
+# Treatment information text boxes (Wider, shorter height)
+description_label = tk.Label(patient_frame, text="Disease Description:")
+description_label.pack(pady=5)
+description_textbox = tk.Text(patient_frame, font=("Arial", 10), height=2, width=100)  # 2 times wider, 0.5 times height
+description_textbox.pack(pady=5)
 
+medicine_label = tk.Label(patient_frame, text="Medicine:")
+medicine_label.pack(pady=5)
+medicine_textbox = tk.Text(patient_frame, font=("Arial", 10), height=2, width=100)
+medicine_textbox.pack(pady=5)
+
+dose_label = tk.Label(patient_frame, text="Dose:")
+dose_label.pack(pady=5)
+dose_textbox = tk.Text(patient_frame, font=("Arial", 10), height=2, width=100)
+dose_textbox.pack(pady=5)
+
+times_per_day_label = tk.Label(patient_frame, text="Times per Day:")
+times_per_day_label.pack(pady=5)
+times_per_day_textbox = tk.Text(patient_frame, font=("Arial", 10), height=2, width=100)
+times_per_day_textbox.pack(pady=5)
+
+lab_tests_label = tk.Label(patient_frame, text="Lab Tests:")
+lab_tests_label.pack(pady=5)
+lab_tests_textbox = tk.Text(patient_frame, font=("Arial", 10), height=2, width=100)
+lab_tests_textbox.pack(pady=5)
+
+# Add Copyright label (2 inches above the bottom)
+def add_copyright_label(frame):
+    copyright_label = tk.Label(frame, text="© 2025 Debaleena Nandi", anchor="center", font=("Arial", 8))
+    copyright_label.pack(side="bottom", pady=40)  # Adjust padding to be 2 inches above the bottom
+
+# Add copyright to all frames
+add_copyright_label(login_frame)
+add_copyright_label(patient_frame)
+add_copyright_label(reset_frame)
+
+# Start the tkinter main loop
 root.mainloop()
 
 

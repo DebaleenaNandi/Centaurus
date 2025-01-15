@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[26]:
+# In[7]:
 
 
 import tkinter as tk
@@ -531,7 +531,7 @@ disease_dict = {
     "Bipolar Affective Disorder": {
         "description": "Bipolar disorder is a mental health condition characterized by extreme mood swings, including manic episodes and depressive episodes. Symptoms include extreme highs (mania) and lows (depression).",
         "medicine": "Mood stabilizers (e.g., Lithium), Antipsychotics (e.g., Quetiapine), Antidepressants",
-        "dose": "Lithium: 600-1200 mg daily",
+        "dose": "Lithium Carbonate: 600-1200 mg daily",
         "times_per_day": "2-3 times daily",
         "body_weight": "Not typically adjusted for body weight",
         "lab_tests": [
@@ -2184,8 +2184,8 @@ disease_dict = {
 
     "Bipolar Affective Disorder": {
         "description": "Bipolar disorder is a mental health condition characterized by extreme mood swings that include emotional highs (mania) and lows (depression).",
-        "medicine": "Mood stabilizers (e.g., Lithium), Antipsychotics, Antidepressants",
-        "dose": "Lithium: 600-1200 mg per day in divided doses",
+        "medicine": "Mood stabilizers (e.g., Lithium Carbonate), Antipsychotics, Antidepressants",
+        "dose": "Lithium Carbonate: 600-1200 mg per day in divided doses",
         "times_per_day": "2-3 times daily",
         "body_weight": "Not typically adjusted based on body weight",
         "lab_tests": [
@@ -2629,7 +2629,7 @@ disease_dict = {
     "Bipolar Disorder": {
         "description": "Bipolar disorder is a mental health condition characterized by extreme mood swings that include emotional highs (mania or hypomania) and lows (depression).",
         "medicine": "Mood stabilizers (e.g., Lithium), Antipsychotics (e.g., Olanzapine), Antidepressants (e.g., SSRIs)",
-        "dose": "Lithium: 600-1200 mg daily",
+        "dose": "Lithium Carbonate: 600-1200 mg daily",
         "times_per_day": "Once or twice daily",
         "body_weight": "Adjusted for pediatric cases",
         "lab_tests": [
@@ -3195,7 +3195,7 @@ def show_treatment_info():
         speak("Here is the treatment information for the selected disease.")
         speak(f"Description: {treatment_info['description']}")
         speak(f"Medicine: {treatment_info['medicine']}")
-        speak(f"Dose: {treatment_info['dose']}")
+        speak(f"Dose: {treatment_info['dose_per_day']}")
         speak(f"Times per day: {treatment_info['times_per_day']}")
         speak(f"Lab Tests: {', '.join(treatment_info['lab_tests'])}")
 
@@ -3239,12 +3239,17 @@ dob_label.pack(pady=5)
 dob_entry = tk.Entry(patient_frame, font=("Arial", 10))
 dob_entry.pack(pady=5)
 
+date_label = tk.Label(patient_frame, text="Today's date (DD/MM/YYYY):")
+date_label.pack(pady=5)
+date_entry = tk.Entry(patient_frame, font=("Arial", 10))
+date_entry.pack(pady=5)
+
 blood_group_label = tk.Label(patient_frame, text="Blood Group:")
 blood_group_label.pack(pady=5)
 blood_group_entry = tk.Entry(patient_frame, font=("Arial", 10))
 blood_group_entry.pack(pady=5)
 
-height_label = tk.Label(patient_frame, text="Height (cm):")
+height_label = tk.Label(patient_frame, text="Height (feet):")
 height_label.pack(pady=5)
 height_entry = tk.Entry(patient_frame, font=("Arial", 10))
 height_entry.pack(pady=5)
@@ -3293,7 +3298,7 @@ medicine_label.pack(pady=5)
 medicine_textbox = tk.Text(patient_frame, font=("Arial", 10), height=2, width=100)
 medicine_textbox.pack(pady=5)
 
-dose_label = tk.Label(patient_frame, text="Dose:")
+dose_label = tk.Label(patient_frame, text="Dose per Day:")
 dose_label.pack(pady=5)
 dose_textbox = tk.Text(patient_frame, font=("Arial", 10), height=2, width=100)
 dose_textbox.pack(pady=5)
